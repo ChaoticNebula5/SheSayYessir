@@ -68,9 +68,9 @@ class Detector:
         # debug values: face angle 0.17-0.19 when turned, 0.24+ when forward
         face_turned_right = face_angle < 0.20  #0.17-0.19 range
         
-        # tighter thresholds needed
+        # Tighter to avoid stealing six-seven (which reaches 0.68)
         left_hand_near_face = distance(left_wrist, jaw_ref) < 0.40
-        right_hand_near_face = distance(right_wrist, jaw_ref) < 0.70  #hands down = 1.4+
+        right_hand_near_face = distance(right_wrist, jaw_ref) < 0.60  # was 0.70, tightened
         
         if face_turned_right and (left_hand_near_face or right_hand_near_face):
             return "jawline"
@@ -103,10 +103,11 @@ class Detector:
         )
 
         if hands_visible and self.prev_left_y is not None and self.prev_right_y is not None:
-            left_up = lw_y < self.prev_left_y - 0.01 
-            left_down = lw_y > self.prev_left_y + 0.01
-            right_up = rw_y < self.prev_right_y - 0.01
-            right_down = rw_y > self.prev_right_y + 0.01
+            # More sensitive motion detection (was 0.01, now 0.005)
+            left_up = lw_y < self.prev_left_y - 0.005 
+            left_down = lw_y > self.prev_left_y + 0.005
+            right_up = rw_y < self.prev_right_y - 0.005
+            right_down = rw_y > self.prev_right_y + 0.005
             
             alternating = (left_up and right_down) or (left_down and right_up)
             
